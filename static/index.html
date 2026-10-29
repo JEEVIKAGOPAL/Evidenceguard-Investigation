@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EvidenceGuard | SOC Investigation</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="login-screen" class="login-wrap">
+    <div class="login-art">
+      <div class="brand brand-light"><span class="brand-mark">E</span><span>EvidenceGuard</span></div>
+      <div class="login-art-copy">
+        <div class="eyebrow">SECURITY OPERATIONS · INVESTIGATION</div>
+        <h1>Turn alerts into<br><span>evidence-led decisions.</span></h1>
+        <p>Review evidence gaps, understand investigative limitations, and keep analysts in control of every conclusion.</p>
+      </div>
+      <div class="login-foot"><span class="pulse"></span> Evidence review workspace <span class="muted-light">·</span> Analyst-controlled</div>
+    </div>
+    <div class="login-panel">
+      <div class="mobile-brand brand"><span class="brand-mark">E</span><span>EvidenceGuard</span></div>
+      <div class="login-form-wrap">
+        <div class="eyebrow">WELCOME BACK</div>
+        <h2>Sign in to your workspace</h2>
+        <p class="subtle">Use the administrator credentials configured in your <code>.env</code> file.</p>
+        <form id="login-form">
+          <label for="username">Username</label>
+          <input id="username" name="username" autocomplete="username" required value="admin">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+          <button class="btn btn-primary btn-wide" type="submit">Sign in <span>→</span></button>
+          <div id="login-error" class="form-error" role="alert"></div>
+        </form>
+        <div class="security-note"><span>◆</span> Investigation data stays in your local application database.</div>
+      </div>
+      <div class="login-bottom">EvidenceGuard <span>·</span> Local prototype</div>
+    </div>
+  </div>
+
+  <div id="app-screen" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">E</span><span>EvidenceGuard</span></div>
+      <div class="side-label">WORKSPACE</div>
+      <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span> Overview</button>
+      <button class="nav-item" data-view="incidents"><span class="nav-icon">⌁</span> Investigations <span id="nav-count" class="nav-count">0</span></button>
+      <button class="nav-item" data-view="evidence"><span class="nav-icon">◈</span> Evidence analysis</button>
+      <div class="side-label side-label-spaced">SYSTEM</div>
+      <button class="nav-item" data-view="integrations"><span class="nav-icon">⛓</span> Wazuh integration</button>
+      <button class="nav-item" data-view="audit"><span class="nav-icon">≡</span> Audit trail</button>
+      <div class="sidebar-bottom">
+        <div class="sidebar-status"><span class="pulse"></span><div><strong>Local workspace</strong><small>API connection available</small></div></div>
+        <div class="user-card"><div class="avatar">A</div><div class="user-meta"><strong id="user-name">Administrator</strong><small>Security administrator</small></div><button id="logout-btn" class="icon-btn" title="Sign out">↗</button></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div><div class="breadcrumb">WORKSPACE <span>/</span> <strong id="crumb">Overview</strong></div><div class="top-title" id="page-title">Security overview</div></div>
+        <div class="top-actions"><div class="live-chip"><span class="pulse"></span> Evidence review active</div><button id="refresh-btn" class="btn btn-secondary">↻ <span>Refresh</span></button></div>
+      </header>
+      <div class="content-area">
+        <div id="notice" class="notice hidden"></div>
+        <section id="overview-view" class="view">
+          <div class="welcome-row"><div><div class="eyebrow">SOC INVESTIGATION WORKSPACE</div><h1>Good work starts with <span>good evidence.</span></h1><p>Monitor investigations, identify evidence gaps, and document what still needs to be verified.</p></div><button class="btn btn-primary" id="view-incidents-btn">Review investigations <span>→</span></button></div>
+          <div class="metric-grid">
+            <article class="metric-card"><div class="metric-top"><span>Total investigations</span><span class="metric-icon blue">◫</span></div><div id="metric-total" class="metric-value">—</div><div class="metric-foot">Recorded cases</div></article>
+            <article class="metric-card"><div class="metric-top"><span>Open cases</span><span class="metric-icon amber">◷</span></div><div id="metric-open" class="metric-value">—</div><div class="metric-foot">Awaiting review</div></article>
+            <article class="metric-card"><div class="metric-top"><span>Evidence gaps</span><span class="metric-icon red">◇</span></div><div id="metric-gaps" class="metric-value">—</div><div class="metric-foot">Marked missing</div></article>
+            <article class="metric-card"><div class="metric-top"><span>High / critical</span><span class="metric-icon purple">⌁</span></div><div id="metric-high" class="metric-value">—</div><div class="metric-foot">Priority cases</div></article>
+          </div>
+          <div class="dashboard-grid">
+            <section class="panel recent-panel"><div class="panel-heading"><div><h3>Recent investigations</h3><p>Latest cases in your workspace</p></div><button class="text-btn" data-view="incidents">View all →</button></div><div id="recent-list" class="recent-list"><div class="loading">Loading investigations…</div></div></section>
+            <section class="panel distribution-panel"><div class="panel-heading"><div><h3>Severity distribution</h3><p>Current case portfolio</p></div></div><div id="severity-bars" class="severity-bars"></div><div class="panel-tip"><span>i</span><p>Severity reflects the source alert and should be reviewed against incident context.</p></div></section>
+          </div>
+          <div class="panel workflow-panel"><div class="panel-heading"><div><h3>Investigation workflow</h3><p>A repeatable process for evidence-led triage</p></div><span class="mini-label">ANALYST CONTROLLED</span></div><div class="workflow-steps"><div class="workflow-step"><span>01</span><strong>Review alert</strong><small>Understand the original event</small></div><div class="workflow-arrow">→</div><div class="workflow-step"><span>02</span><strong>Check evidence</strong><small>Mark status from verified sources</small></div><div class="workflow-arrow">→</div><div class="workflow-step"><span>03</span><strong>Analyze gaps</strong><small>Explain what remains unknown</small></div><div class="workflow-arrow">→</div><div class="workflow-step"><span>04</span><strong>Report findings</strong><small>Record and export the review</small></div></div></div>
+        </section>
+
+        <section id="incidents-view" class="view hidden">
+          <div class="section-intro"><div><div class="eyebrow">CASE MANAGEMENT</div><h1>Investigations</h1><p>Open a case to review its alert, update evidence statuses, and run gap analysis.</p></div><button id="new-incident-btn" class="btn btn-primary">＋ New investigation</button></div>
+          <div class="panel table-panel"><div class="table-toolbar"><div class="search-wrap"><span>⌕</span><input id="incident-search" placeholder="Search cases, alerts, agents…"></div><select id="severity-filter"><option value="all">All severities</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select><select id="status-filter"><option value="all">All statuses</option><option>Open</option><option>Resolved</option></select></div><div class="table-scroll"><table><thead><tr><th>Investigation</th><th>Severity</th><th>Status</th><th>Evidence gaps</th><th>Last updated</th><th></th></tr></thead><tbody id="incident-table-body"></tbody></table></div></div>
+        </section>
+
+        <section id="evidence-view" class="view hidden">
+          <div class="section-intro"><div><div class="eyebrow">EVIDENCE VERIFICATION</div><h1>Evidence analysis</h1><p>Missing means checked but not found. Unchecked means the source has not yet been examined.</p></div></div>
+          <div id="evidence-empty" class="empty-state panel"><div class="empty-icon">◈</div><h3>Select an investigation</h3><p>Choose a case from Investigations to inspect its evidence checklist.</p><button class="btn btn-secondary" data-view="incidents">Open investigations</button></div>
+          <div id="evidence-workspace" class="hidden"></div>
+        </section>
+
+        <section id="integrations-view" class="view hidden">
+          <div class="section-intro"><div><div class="eyebrow">DATA SOURCES</div><h1>Wazuh integration</h1><p>Check the configured Manager API connection and understand which alert source is currently active.</p></div><button id="test-wazuh-btn" class="btn btn-primary">Test connection</button></div>
+          <div class="integration-grid"><div class="panel integration-card"><div class="integration-logo">W</div><div><h3>Wazuh Manager API</h3><p>Agent inventory and manager-side API connectivity.</p></div><span id="wazuh-agent-status" class="status-pill status-unknown">Not tested</span><div id="wazuh-agent-detail" class="integration-detail">Run a connection test to check your .env settings.</div></div><div class="panel integration-card"><div class="integration-logo indexer">≋</div><div><h3>Alert source</h3><p>Local alerts.json file or clearly labelled sample alerts.</p></div><span id="wazuh-alert-status" class="status-pill status-unknown">Not tested</span><div id="wazuh-alert-detail" class="integration-detail">Sample events are labelled as illustrative and are not live telemetry.</div></div></div>
+          <div class="panel info-panel"><h3>Connection checklist</h3><ul><li>Set the correct <code>WAZUH_API_URL</code> in your local <code>.env</code> file.</li><li>Use an authorized Wazuh API account and verify network access to the configured port.</li><li>For live alert ingestion, configure an accessible <code>WAZUH_ALERTS_FILE</code> path or implement an approved Indexer integration.</li><li>Use trusted TLS certificates in any real deployment.</li></ul></div>
+        </section>
+
+        <section id="audit-view" class="view hidden"><div class="section-intro"><div><div class="eyebrow">ACCOUNTABILITY</div><h1>Audit trail</h1><p>Recent sign-ins and investigation actions recorded by this application.</p></div><button id="refresh-audit-btn" class="btn btn-secondary">↻ Refresh</button></div><div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody id="audit-table-body"></tbody></table></div></div></section>
+      </div>
+      <footer class="footer"><span>EvidenceGuard <span class="footer-dot">●</span> Local prototype</span><span>Evidence-led triage · Analyst remains in control</span></footer>
+    </main>
+  </div>
+
+  <div id="incident-modal" class="modal-backdrop hidden"><div class="modal"><div class="modal-heading"><div><div class="eyebrow">NEW CASE</div><h2>Create investigation</h2></div><button class="icon-btn" id="close-modal-btn">×</button></div><form id="incident-form"><label>Investigation title<input id="new-title" required minlength="3" placeholder="e.g. Suspicious SSH authentication activity"></label><label>Severity<select id="new-severity"><option>High</option><option>Critical</option><option selected>Medium</option><option>Low</option></select></label><label>Alert description<textarea id="new-description" required rows="3" placeholder="Describe the alert or paste a concise summary…"></textarea></label><label>Source IP (optional)<input id="new-ip" placeholder="e.g. 192.0.2.45"></label><div class="modal-actions"><button type="button" id="cancel-modal-btn" class="btn btn-secondary">Cancel</button><button type="submit" class="btn btn-primary">Create case</button></div></form></div></div>
+  <div id="toast" class="toast hidden"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
